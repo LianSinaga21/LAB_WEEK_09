@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation("androidx.navigation:navigation-compose:2.7.4")
+
 
 
     implementation("androidx.compose.material3:material3:1.1.2")
