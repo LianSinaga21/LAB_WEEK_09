@@ -1,6 +1,7 @@
 package com.example.lab_week_09
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -12,19 +13,20 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
 import com.example.lab_week_09.ui.theme.*
 
+// ✅ Main Activity
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,22 +47,21 @@ class MainActivity : ComponentActivity() {
 // ✅ Data model
 data class Student(var name: String)
 
-
-// ✅ ROOT composable - semua route didefinisikan di sini
+// ✅ Root composable (definisi route)
 @Composable
 fun App(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = "home"
     ) {
-        // 🔹 Route: Home
+        // 🔹 Route Home
         composable("home") {
             Home { listString ->
                 navController.navigate("resultContent/?listData=$listString")
             }
         }
 
-        // 🔹 Route: ResultContent
+        // 🔹 Route Result Content
         composable(
             route = "resultContent/?listData={listData}",
             arguments = listOf(
@@ -74,12 +75,13 @@ fun App(navController: NavHostController) {
     }
 }
 
-
-// ✅ Home Composable (Parent)
+// ✅ Home (Parent)
 @Composable
 fun Home(
     navigateFromHomeToResult: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
     val listData = remember {
         mutableStateListOf(
             Student("Tanu"),
@@ -95,9 +97,12 @@ fun Home(
         inputField = inputField,
         onInputValueChange = { inputField = Student(it) },
         onButtonClick = {
+            // 🔹 Cegah submit kosong
             if (inputField.name.isNotBlank()) {
                 listData.add(inputField)
                 inputField = Student("")
+            } else {
+                Toast.makeText(context, "Please enter a name first!", Toast.LENGTH_SHORT).show()
             }
         },
         navigateFromHomeToResult = {
@@ -106,8 +111,7 @@ fun Home(
     )
 }
 
-
-// ✅ Child Composable (UI)
+// ✅ Child (UI)
 @Composable
 fun HomeContent(
     listData: SnapshotStateList<Student>,
@@ -131,11 +135,16 @@ fun HomeContent(
                     onValueChange = { onInputValueChange(it) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text
-                    )
+                    ),
+                    label = { Text("Enter student name") }
                 )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
                 // 🔹 Dua tombol: Submit & Finish
-                Row {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     PrimaryTextButton(
                         text = stringResource(id = R.string.button_click)
                     ) {
@@ -165,7 +174,6 @@ fun HomeContent(
     }
 }
 
-
 // ✅ Result Screen
 @Composable
 fun ResultContent(listData: String) {
@@ -179,7 +187,7 @@ fun ResultContent(listData: String) {
     }
 }
 
-
+// ✅ Preview
 @Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
