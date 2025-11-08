@@ -26,7 +26,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.lab_week_09.ui.theme.*
 
-// ✅ Main Activity
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,21 +46,21 @@ class MainActivity : ComponentActivity() {
 // ✅ Data model
 data class Student(var name: String)
 
-// ✅ Root composable (definisi route)
+// ✅ ROOT composable - semua route didefinisikan di sini
 @Composable
 fun App(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = "home"
     ) {
-        // 🔹 Route Home
+        // 🔹 Route: Home
         composable("home") {
             Home { listString ->
                 navController.navigate("resultContent/?listData=$listString")
             }
         }
 
-        // 🔹 Route Result Content
+        // 🔹 Route: ResultContent
         composable(
             route = "resultContent/?listData={listData}",
             arguments = listOf(
@@ -75,7 +74,7 @@ fun App(navController: NavHostController) {
     }
 }
 
-// ✅ Home (Parent)
+// ✅ Home Composable (Parent)
 @Composable
 fun Home(
     navigateFromHomeToResult: (String) -> Unit
@@ -97,7 +96,7 @@ fun Home(
         inputField = inputField,
         onInputValueChange = { inputField = Student(it) },
         onButtonClick = {
-            // 🔹 Cegah submit kosong
+            // ✅ Cegah submit kosong
             if (inputField.name.isNotBlank()) {
                 listData.add(inputField)
                 inputField = Student("")
@@ -111,7 +110,7 @@ fun Home(
     )
 }
 
-// ✅ Child (UI)
+// ✅ Child Composable (UI)
 @Composable
 fun HomeContent(
     listData: SnapshotStateList<Student>,
@@ -135,16 +134,11 @@ fun HomeContent(
                     onValueChange = { onInputValueChange(it) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text
-                    ),
-                    label = { Text("Enter student name") }
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
                 // 🔹 Dua tombol: Submit & Finish
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Row {
                     PrimaryTextButton(
                         text = stringResource(id = R.string.button_click)
                     ) {
@@ -187,7 +181,6 @@ fun ResultContent(listData: String) {
     }
 }
 
-// ✅ Preview
 @Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
